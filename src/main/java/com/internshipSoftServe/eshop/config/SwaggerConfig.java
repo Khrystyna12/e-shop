@@ -52,7 +52,7 @@ public class SwaggerConfig {
     public Docket productsApi(){
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("localhost:8090"))
+                .apis(RequestHandlerSelectors.basePackage("com.internshipSoftServe"))
                 .paths(regex("/shop.*"))
                 .build()
                 .apiInfo(apiInfo());
