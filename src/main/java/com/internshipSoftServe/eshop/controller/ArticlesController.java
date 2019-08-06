@@ -4,19 +4,18 @@ import com.internshipSoftServe.eshop.model.Articles;
 import com.internshipSoftServe.eshop.model.Product;
 import com.internshipSoftServe.eshop.repository.ArticlesRepository;
 import com.internshipSoftServe.eshop.repository.ProductRepository;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+@Api(value = "Articles", produces = MediaType.APPLICATION_JSON_VALUE)
 @Controller
 @RequestMapping(value = "/shop")
-@Api(value = "Article", description = "Article to product", basePath = "/shop")
 public class ArticlesController {
 
     @Autowired
@@ -24,19 +23,24 @@ public class ArticlesController {
     @Autowired
     private ProductRepository productRepository;
 
+    public ArticlesController(ArticlesRepository articlesRepository, ProductRepository productRepository) {
+        this.articlesRepository = articlesRepository;
+        this.productRepository = productRepository;
+    }
+
     @ApiOperation(value = "Get all articles", response = Articles.class)
     @GetMapping("/articles")
-    @ResponseBody
-    public  Iterable<Articles> getAllArticles(){
+    public @ResponseBody Iterable<Articles> getAllArticles(){
         return articlesRepository.findAll();
     }
 
+    @ApiOperation(value = "Get articles by id", response = Articles.class)
     @GetMapping("/articles/{articleId}")
-    @ResponseBody
-    public Articles getOneArticle(@PathVariable("articleId") long articleId){
-        return articlesRepository.findById(articleId).orElse(null);
+    public @ResponseBody Articles getOneArticle(@PathVariable("articleId") long articleId){
+        return articlesRepository.findById(articleId).orElseThrow(RuntimeException::new);
     }
 
+    @ApiOperation(value = "Get articles by product id", response = Articles.class)
     @GetMapping("products/{productId}/articles")
     public @ResponseBody Iterable<Articles> getArticleByProduct (@ApiParam(value = "Product param id", example = "1")@PathVariable ("productId") long productId){
         Product product = productRepository.findById(productId).orElseThrow(RuntimeException::new);
@@ -44,10 +48,9 @@ public class ArticlesController {
     }
 
     @ApiOperation(value = "Create article to product by param: id")
-    @PostMapping("/products/{productId}/articles")
-    public ResponseEntity<Articles> createNewArticleToProduct(@ApiParam(value = "Product param id", example = "1")@PathVariable("productId") long productId,
-                                                              @ApiParam(value = "Request body Article",required = true)@Valid @RequestBody Articles article){
-        Product product = productRepository.findById(productId).orElseThrow(RuntimeException::new);
+    @PostMapping("/articles")
+    public ResponseEntity<Articles> createNewArticleToProduct(@ApiParam(value = "Request body Article",required = true)@Valid @RequestBody Articles article){
+        Product product = productRepository.findById(article.getProductId()).orElseThrow(RuntimeException::new);
         article.setProduct(product);
         return ResponseEntity.ok(articlesRepository.save(article));
     }
@@ -68,11 +71,8 @@ public class ArticlesController {
 
     @ApiOperation(value = "Delete Article by id")
     @DeleteMapping("/articles/{articleId}")
-    public void deleteArticle(@ApiParam(value = "Article param id", example = "1")@PathVariable Long articleId){
+    public void deleteArticle(@ApiParam(value = "Article param id", example = "1")@PathVariable long articleId){
          articlesRepository.deleteById(articleId);
     }
 
-    public void setProductRepository(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
 }

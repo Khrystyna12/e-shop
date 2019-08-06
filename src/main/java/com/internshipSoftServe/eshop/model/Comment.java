@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
+@Table(name = "comments")
+
 @Data
 public class Comment {
     @Id

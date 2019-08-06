@@ -50,9 +50,9 @@ public class ProductController {
 		return category.getProducts();
     }
 	
-	@PostMapping("/categories/{categoryId}/products")
-    public ResponseEntity<Product> createNewProduct(@PathVariable("categoryId") long categoryId, @Valid @RequestBody Product product){
-		Category category = categoryRepository.findById(categoryId)
+	@PostMapping("/products")
+    public ResponseEntity<Product> createNewProduct(@Valid @RequestBody Product product){
+		Category category = categoryRepository.findById(product.getCategoryId())
 				.orElseThrow(RuntimeException::new);
         product.setCategory(category);
 		return ResponseEntity.ok(productRepository.save(product));
@@ -67,6 +67,7 @@ public class ProductController {
         	  product1.setQuantity(product2.getQuantity());
         	  product1.setDescription(product2.getDescription());
         	  product1.setPhoto(product2.getPhoto());
+        	  product1.setCategory(product2.getCategory());
               Product updated = productRepository.save(product1);
               return ResponseEntity.ok().body(updated);
           }).orElse(ResponseEntity.notFound().build());

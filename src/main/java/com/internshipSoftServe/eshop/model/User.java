@@ -1,19 +1,28 @@
 package com.internshipSoftServe.eshop.model;
 
 
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.Size;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 import lombok.ToString;
 
-import javax.annotation.sql.DataSourceDefinition;
-import javax.persistence.*;
-import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
-
 @Entity
-@Table(name = "usr")
+@Table(name = "users")
 
 @Data
 public class User {
@@ -27,7 +36,7 @@ public class User {
 
     @Column(length = 255)
     @Size(max = 255)
-    private String password;
+    private byte[] password;
     
     @Column(length = 255)
     @Size(max = 255)
@@ -43,12 +52,10 @@ public class User {
 
     private boolean active;
 
-    private LocalDateTime created_at;
+    private Date created_at;
 
-    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
-    @Enumerated(EnumType.STRING)
-    private Set<Role> roles;
+    @Enumerated(value = EnumType.STRING)
+    private Role role;
 
     @ToString.Exclude
     @JsonIgnore
@@ -59,4 +66,9 @@ public class User {
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Order> orders;
+    
+    public enum Role{
+        admin,
+        user;
+    }
 }

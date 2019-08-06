@@ -11,21 +11,13 @@ import javax.validation.constraints.Size;
 
 
 @Entity
+@Table(name = "products")
+
 @Data
 public class Product {
-	public Product() {}
-	
-    public Product(@Size(max = 45) String name, int price, int quantity, @Size(max = 255) String description,
-			@Size(max = 255) String photo) {
-		this.name = name;
-		this.price = price;
-		this.quantity = quantity;
-		this.description = description;
-		this.photo = photo;
-	}
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(length = 45)
@@ -56,7 +48,7 @@ public class Product {
     
     @ToString.Exclude
     @JsonIgnore
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Articles> articles;
     
     @ToString.Exclude
@@ -64,6 +56,14 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<Comment> comments;
 
+    public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+    
 	public String getName() {
 		return name;
 	}
@@ -110,6 +110,15 @@ public class Product {
 
 	public void setCategory(Category category) {
 		this.category = category;
+	}
+	
+	public long getCategoryId() {
+		return category.getId();
+	}
+	
+	public void setCategoryId(long categoryId) {
+		this.category = new Category();
+		this.category.setId(categoryId);
 	}
 
 	public List<Articles> getArticles() {
